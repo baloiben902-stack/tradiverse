@@ -10,11 +10,11 @@ class TradiverseApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      debugShowCheckedModeBanner: false,
       title: 'Tradiverse',
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFF1565C0),
+          seedColor: Colors.green,
         ),
         useMaterial3: true,
       ),
@@ -40,30 +40,19 @@ class TradiverseHome extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            const Text(
+              'Trade Anything. Value Everything.',
+              style: TextStyle(
+                fontSize: 28,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 10),
+            const Text(
+              'Turn what you have into what you need through trusted exchanges.',
+              style: TextStyle(fontSize: 16),
+            ),
             const SizedBox(height: 24),
-            const Text(
-              'Trade Anything.',
-              style: TextStyle(
-                fontSize: 32,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const Text(
-              'Value Everything.',
-              style: TextStyle(
-                fontSize: 32,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 12),
-            Text(
-              'Turn what you have into what you need.',
-              style: TextStyle(
-                fontSize: 17,
-                color: Colors.grey.shade700,
-              ),
-            ),
-            const SizedBox(height: 28),
             Card(
               child: ListTile(
                 leading: const Icon(Icons.swap_horiz, size: 40),
@@ -108,3 +97,4 @@ class TradiverseHome extends StatelessWidget {
       ),
     );
   }
+}
