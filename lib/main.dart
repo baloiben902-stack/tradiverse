@@ -108,4 +108,3 @@ class TradiverseHome extends StatelessWidget {
       ),
     );
   }
-}EOF
