@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../trade_offer/trade_offer_screen.dart';
 
 class TradeDetailsScreen extends StatelessWidget {
   final String title;
@@ -101,7 +102,17 @@ class TradeDetailsScreen extends StatelessWidget {
               width: double.infinity,
               height: 52,
               child: ElevatedButton.icon(
-                onPressed: () {},
+                onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => TradeOfferScreen(
+                    itemTitle: title,
+                    itemValue: value,
+                  ),
+                ),
+              );
+            },
                 icon: const Icon(Icons.swap_horiz),
                 label: const Text(
                   'Make Trade Offer',
