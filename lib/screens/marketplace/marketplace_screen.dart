@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'trade_details_screen.dart';
 
 class MarketplaceScreen extends StatelessWidget {
   const MarketplaceScreen({super.key});
@@ -82,11 +83,23 @@ class MarketplaceScreen extends StatelessWidget {
             ),
             const SizedBox(height: 12),
 
-            const _ListingCard(
+            _ListingCard(
               icon: Icons.laptop_mac,
               title: 'Laptop',
               value: 'R8,000',
               description: 'Good condition • Johannesburg',
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const TradeDetailsScreen(
+                      title: 'Laptop',
+                      value: 'R8,000',
+                      description: 'Good condition • Johannesburg',
+                    ),
+                  ),
+                );
+              },
             ),
 
             const _ListingCard(
@@ -152,56 +165,62 @@ class _ListingCard extends StatelessWidget {
   final String title;
   final String value;
   final String description;
+  final VoidCallback? onTap;
 
   const _ListingCard({
     required this.icon,
     required this.title,
     required this.value,
     required this.description,
+    this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
     return Card(
       margin: const EdgeInsets.only(bottom: 14),
-      child: Padding(
-        padding: const EdgeInsets.all(14),
-        child: Row(
-          children: [
-            Container(
-              width: 75,
-              height: 75,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(14),
-                color: Colors.grey.shade100,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(16),
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.all(14),
+          child: Row(
+            children: [
+              Container(
+                width: 75,
+                height: 75,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(14),
+                  color: Colors.grey.shade100,
+                ),
+                child: Icon(icon, size: 38),
               ),
-              child: Icon(icon, size: 38),
-            ),
-            const SizedBox(width: 14),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: const TextStyle(
-                      fontSize: 17,
-                      fontWeight: FontWeight.bold,
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: const TextStyle(
+                        fontSize: 17,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(description),
-                  const SizedBox(height: 6),
-                  Text(
-                    'Estimated value: $value',
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
+                    const SizedBox(height: 4),
+                    Text(description),
+                    const SizedBox(height: 6),
+                    Text(
+                      'Estimated value: $value',
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
