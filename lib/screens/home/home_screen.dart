@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../marketplace/marketplace_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -188,7 +189,14 @@ class _ExploreCard extends StatelessWidget {
     return Card(
       child: InkWell(
         borderRadius: BorderRadius.circular(16),
-        onTap: () {},
+        onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const MarketplaceScreen(),
+                      ),
+                    );
+                  },
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: Column(
