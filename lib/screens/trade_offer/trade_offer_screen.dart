@@ -64,12 +64,21 @@ class _TradeOfferScreenState extends State<TradeOfferScreen> {
                 height: 56,
                 child: ElevatedButton.icon(
                   onPressed: () {
+                  if (offerController.text.trim().isEmpty) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
-                        content: Text('Trade offer ready to be sent.'),
+                        content: Text('Please enter what you are offering.'),
                       ),
                     );
-                  },
+                    return;
+                  }
+
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Trade offer ready to be sent.'),
+                    ),
+                  );
+                },
                   icon: const Icon(Icons.send_rounded),
                   label: const Text(
                     'Send Trade Offer',
