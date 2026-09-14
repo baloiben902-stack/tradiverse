@@ -19,6 +19,31 @@ class _ConversationScreenState extends State<ConversationScreen> {
 
   final List<String> messages = [];
 
+  final List<String> emojis = [
+    '😀',
+    '😂',
+    '😍',
+    '😊',
+    '👍',
+    '❤️',
+    '🔥',
+    '👏',
+    '🙏',
+    '🤝',
+    '🎉',
+    '💯',
+    '😎',
+    '😉',
+    '😢',
+    '😮',
+    '🤔',
+    '🙌',
+    '💚',
+    '🌍',
+  ];
+
+  bool showEmojiPicker = false;
+
   @override
   void dispose() {
     messageController.dispose();
@@ -36,6 +61,15 @@ class _ConversationScreenState extends State<ConversationScreen> {
     });
   }
 
+  void _addEmoji(String emoji) {
+    setState(() {
+      messageController.text += emoji;
+      messageController.selection = TextSelection.fromPosition(
+        TextPosition(offset: messageController.text.length),
+      );
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -46,6 +80,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
           style: const TextStyle(fontWeight: FontWeight.w700),
         ),
         backgroundColor: Colors.white,
+        foregroundColor: Colors.black87,
       ),
       body: Column(
         children: [
@@ -89,11 +124,48 @@ class _ConversationScreenState extends State<ConversationScreen> {
                     },
                   ),
           ),
+          if (showEmojiPicker)
+            Container(
+              height: 210,
+              padding: const EdgeInsets.all(12),
+              color: Colors.white,
+              child: GridView.builder(
+                itemCount: emojis.length,
+                gridDelegate:
+                    const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 7,
+                  childAspectRatio: 1,
+                ),
+                itemBuilder: (context, index) {
+                  return InkWell(
+                    onTap: () => _addEmoji(emojis[index]),
+                    borderRadius: BorderRadius.circular(12),
+                    child: Center(
+                      child: Text(
+                        emojis[index],
+                        style: const TextStyle(fontSize: 28),
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
           SafeArea(
             child: Padding(
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.fromLTRB(12, 8, 12, 12),
               child: Row(
                 children: [
+                  IconButton(
+                    onPressed: () {
+                      setState(() {
+                        showEmojiPicker = !showEmojiPicker;
+                      });
+                    },
+                    icon: const Icon(
+                      Icons.emoji_emotions_outlined,
+                      color: Color(0xFF176B4D),
+                    ),
+                  ),
                   Expanded(
                     child: TextField(
                       controller: messageController,
