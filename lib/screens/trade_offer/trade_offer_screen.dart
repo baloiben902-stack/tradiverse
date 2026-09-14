@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
+import '../messages/conversation_screen.dart';
 
 class TradeOfferScreen extends StatefulWidget {
   final String itemTitle;
   final String itemValue;
+  final String ownerName;
 
   const TradeOfferScreen({
     super.key,
     required this.itemTitle,
     required this.itemValue,
+    this.ownerName = 'Trader',
   });
 
   @override
@@ -73,9 +76,13 @@ class _TradeOfferScreenState extends State<TradeOfferScreen> {
                     return;
                   }
 
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Trade offer ready to be sent.'),
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => ConversationScreen(
+                        otherUserName: widget.ownerName,
+                        itemTitle: widget.itemTitle,
+                      ),
                     ),
                   );
                 },

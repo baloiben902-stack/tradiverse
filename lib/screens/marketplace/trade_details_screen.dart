@@ -5,12 +5,14 @@ class TradeDetailsScreen extends StatelessWidget {
   final String title;
   final String value;
   final String description;
+  final String ownerName;
 
   const TradeDetailsScreen({
     super.key,
     required this.title,
     required this.value,
     required this.description,
+    this.ownerName = 'Trader',
   });
 
   @override
@@ -109,6 +111,7 @@ class TradeDetailsScreen extends StatelessWidget {
                   builder: (context) => TradeOfferScreen(
                     itemTitle: title,
                     itemValue: value,
+                          ownerName: ownerName,
                   ),
                 ),
               );
