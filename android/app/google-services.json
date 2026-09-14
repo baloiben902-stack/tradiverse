@@ -1,0 +1,68 @@
+{
+  "project_info": {
+    "project_number": "207609244450",
+    "project_id": "tradiverser",
+    "storage_bucket": "tradiverser.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:207609244450:android:05709d1295fcebec53937b",
+        "android_client_info": {
+          "package_name": "com.example.tradiverse"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "207609244450-s3a4r5qtsv53c7d55fvdcd5urhlvf26n.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDS8qEWdVbaXlJm-9KDh1Q4xldyWmCHkzE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "207609244450-s3a4r5qtsv53c7d55fvdcd5urhlvf26n.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:207609244450:android:4df53441e901c0f753937b",
+        "android_client_info": {
+          "package_name": "com.tradiverse.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "207609244450-s3a4r5qtsv53c7d55fvdcd5urhlvf26n.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDS8qEWdVbaXlJm-9KDh1Q4xldyWmCHkzE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "207609244450-s3a4r5qtsv53c7d55fvdcd5urhlvf26n.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
