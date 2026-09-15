@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:record/record.dart';
+import 'package:path_provider/path_provider.dart';
 
 class ConversationScreen extends StatefulWidget {
   final String otherUserName;
@@ -43,11 +45,58 @@ class _ConversationScreenState extends State<ConversationScreen> {
   ];
 
   bool showEmojiPicker = false;
+  final AudioRecorder audioRecorder = AudioRecorder();
+  bool isRecording = false;
+  String? recordingPath;
 
   @override
   void dispose() {
     messageController.dispose();
+    audioRecorder.dispose();
     super.dispose();
+  }
+
+  Future<void> _toggleRecording() async {
+    if (isRecording) {
+      final path = await audioRecorder.stop();
+
+      setState(() {
+        isRecording = false;
+        recordingPath = path;
+      });
+
+      if (path != null && mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Voice note recorded.')),
+        );
+      }
+      return;
+    }
+
+    final hasPermission = await audioRecorder.hasPermission();
+
+    if (!hasPermission) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Microphone permission is required.')),
+        );
+      }
+      return;
+    }
+
+    final directory = await getTemporaryDirectory();
+    final path =
+        '${directory.path}/tradiverse_voice_${DateTime.now().millisecondsSinceEpoch}.m4a';
+
+    await audioRecorder.start(
+      const RecordConfig(),
+      path: path,
+    );
+
+    setState(() {
+      isRecording = true;
+      recordingPath = null;
+    });
   }
 
   void _sendMessage() {
@@ -166,7 +215,19 @@ class _ConversationScreenState extends State<ConversationScreen> {
                       color: Color(0xFF176B4D),
                     ),
                   ),
-                  Expanded(
+                  IconButton(
+              onPressed: _toggleRecording,
+              icon: Icon(
+                isRecording
+                    ? Icons.stop_circle_outlined
+                    : Icons.mic_none_rounded,
+                color: isRecording
+                    ? Colors.red
+                    : const Color(0xFF17684D),
+              ),
+              tooltip: isRecording ? 'Stop recording' : 'Voice note',
+            ),
+            Expanded(
                     child: TextField(
                       controller: messageController,
                       textInputAction: TextInputAction.send,
