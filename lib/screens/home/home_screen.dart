@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../marketplace/marketplace_screen.dart';
+import '../trades/my_trades_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -132,6 +133,11 @@ class HomeScreen extends StatelessWidget {
                   icon: Icons.groups,
                   title: 'Communities',
                 ),
+                _ExploreCard(
+                  icon: Icons.swap_horizontal_circle_outlined,
+                  title: 'My Trades',
+                  destination: MyTradesScreen(),
+                ),
               ],
             ),
 
@@ -178,10 +184,12 @@ class HomeScreen extends StatelessWidget {
 class _ExploreCard extends StatelessWidget {
   final IconData icon;
   final String title;
+  final Widget? destination;
 
   const _ExploreCard({
     required this.icon,
     required this.title,
+    this.destination,
   });
 
   @override
@@ -193,7 +201,7 @@ class _ExploreCard extends StatelessWidget {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (_) => const MarketplaceScreen(),
+                        builder: (_) => destination ?? const MarketplaceScreen(),
                       ),
                     );
                   },
