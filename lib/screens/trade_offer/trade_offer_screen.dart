@@ -82,6 +82,9 @@ class _TradeOfferScreenState extends State<TradeOfferScreen> {
                       builder: (_) => ConversationScreen(
                         otherUserName: widget.ownerName,
                         itemTitle: widget.itemTitle,
+                      offeredItem: offerController.text.trim(),
+                      cashDifference: cashController.text.trim(),
+                      offerMessage: messageController.text.trim(),
                       ),
                     ),
                   );

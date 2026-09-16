@@ -5,11 +5,17 @@ import 'package:path_provider/path_provider.dart';
 class ConversationScreen extends StatefulWidget {
   final String otherUserName;
   final String itemTitle;
+  final String offeredItem;
+  final String cashDifference;
+  final String offerMessage;
 
   const ConversationScreen({
     super.key,
     required this.otherUserName,
     required this.itemTitle,
+    this.offeredItem = '',
+    this.cashDifference = '',
+    this.offerMessage = '',
   });
 
   @override
@@ -45,6 +51,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
   ];
 
   bool showEmojiPicker = false;
+  String tradeOfferStatus = 'Pending';
   final AudioRecorder audioRecorder = AudioRecorder();
   bool isRecording = false;
   String? recordingPath;
@@ -144,6 +151,97 @@ class _ConversationScreenState extends State<ConversationScreen> {
             child: Text(
               'Trade: ${widget.itemTitle}',
               style: const TextStyle(fontWeight: FontWeight.w700),
+            ),
+          ),
+          Container(
+            width: double.infinity,
+            margin: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(18),
+              border: Border.all(
+                color: const Color(0xFFE2E8F0),
+              ),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    const Icon(
+                      Icons.swap_horiz_rounded,
+                      color: Color(0xFF176B4D),
+                    ),
+                    const SizedBox(width: 8),
+                    const Expanded(
+                      child: Text(
+                        'Trade Offer',
+                        style: TextStyle(
+                          fontSize: 17,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                    ),
+                    Text(
+                      tradeOfferStatus,
+                      style: TextStyle(
+                        color: tradeOfferStatus == 'Accepted'
+                            ? const Color(0xFF176B4D)
+                            : tradeOfferStatus == 'Declined'
+                                ? Colors.red
+                                : Colors.orange.shade700,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  'Offering: ${widget.offeredItem.isEmpty ? 'Not specified' : widget.offeredItem}',
+                  style: const TextStyle(fontWeight: FontWeight.w600),
+                ),
+                if (widget.cashDifference.isNotEmpty) ...[
+                  const SizedBox(height: 6),
+                  Text('Cash difference: ${widget.cashDifference}'),
+                ],
+                if (widget.offerMessage.isNotEmpty) ...[
+                  const SizedBox(height: 6),
+                  Text('Message: ${widget.offerMessage}'),
+                ],
+                if (tradeOfferStatus == 'Pending') ...[
+                  const SizedBox(height: 14),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: OutlinedButton(
+                          onPressed: () {
+                            setState(() {
+                              tradeOfferStatus = 'Declined';
+                            });
+                          },
+                          child: const Text('Decline'),
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: ElevatedButton(
+                          onPressed: () {
+                            setState(() {
+                              tradeOfferStatus = 'Accepted';
+                            });
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFF176B4D),
+                            foregroundColor: Colors.white,
+                          ),
+                          child: const Text('Accept'),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ],
             ),
           ),
           Expanded(
