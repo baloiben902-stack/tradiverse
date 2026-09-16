@@ -33,6 +33,10 @@ class _MyTradesScreenState extends State<MyTradesScreen> {
           _buildSectionTitle('Trade Status'),
           const SizedBox(height: 12),
           _buildStatusCard(),
+          if (tradeCompleted) ...[
+            const SizedBox(height: 16),
+            _buildReviewButton(context),
+          ],
         ],
       ),
     );
@@ -234,19 +238,19 @@ class _MyTradesScreenState extends State<MyTradesScreen> {
         color: Colors.white,
         borderRadius: BorderRadius.circular(20),
       ),
-      child: const Column(
+      child: Column(
         children: [
-          _StatusStep(
+          const _StatusStep(
             icon: Icons.send_rounded,
             title: 'Offer sent',
             completed: true,
           ),
-          _StatusStep(
+          const _StatusStep(
             icon: Icons.check_circle_outline_rounded,
             title: 'Offer accepted',
             completed: true,
           ),
-          _StatusStep(
+          const _StatusStep(
             icon: Icons.swap_horiz_rounded,
             title: 'Trade in progress',
             completed: true,
@@ -254,13 +258,95 @@ class _MyTradesScreenState extends State<MyTradesScreen> {
           _StatusStep(
             icon: Icons.done_all_rounded,
             title: 'Trade completed',
-            completed: false,
+            completed: tradeCompleted,
           ),
         ],
       ),
     );
   }
 }
+
+
+  Widget _buildReviewButton(BuildContext context) {
+    return SizedBox(
+      width: double.infinity,
+      height: 52,
+      child: ElevatedButton.icon(
+        onPressed: () {
+          int rating = 5;
+          final commentController = TextEditingController();
+
+          showDialog(
+            context: context,
+            builder: (dialogContext) {
+              return StatefulBuilder(
+                builder: (context, setDialogState) {
+                  return AlertDialog(
+                    title: const Text('Leave a Review'),
+                    content: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Text('How was your trade experience?'),
+                        const SizedBox(height: 12),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: List.generate(5, (index) {
+                            final star = index + 1;
+                            return IconButton(
+                              onPressed: () {
+                                setDialogState(() {
+                                  rating = star;
+                                });
+                              },
+                              icon: Icon(
+                                star <= rating
+                                    ? Icons.star_rounded
+                                    : Icons.star_border_rounded,
+                              ),
+                            );
+                          }),
+                        ),
+                        TextField(
+                          controller: commentController,
+                          maxLines: 3,
+                          decoration: const InputDecoration(
+                            hintText: 'Write a comment...',
+                            border: OutlineInputBorder(),
+                          ),
+                        ),
+                      ],
+                    ),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(dialogContext),
+                        child: const Text('Cancel'),
+                      ),
+                      ElevatedButton(
+                        onPressed: () {
+                          Navigator.pop(dialogContext);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Review submitted.'),
+                            ),
+                          );
+                        },
+                        child: const Text('Submit Review'),
+                      ),
+                    ],
+                  );
+                },
+              );
+            },
+          );
+        },
+        icon: const Icon(Icons.star_rounded),
+        label: const Text(
+          'Leave Review',
+          style: TextStyle(fontWeight: FontWeight.w700),
+        ),
+      ),
+    );
+  }
 
 class _StatusStep extends StatelessWidget {
   final IconData icon;
