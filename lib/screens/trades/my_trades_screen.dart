@@ -1,9 +1,15 @@
 import 'package:flutter/material.dart';
 
-class MyTradesScreen extends StatelessWidget {
+class MyTradesScreen extends StatefulWidget {
   const MyTradesScreen({super.key});
 
   @override
+  State<MyTradesScreen> createState() => _MyTradesScreenState();
+}
+
+class _MyTradesScreenState extends State<MyTradesScreen> {
+  bool tradeCompleted = false;
+   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF7F9FC),
@@ -110,13 +116,44 @@ class MyTradesScreen extends StatelessWidget {
             width: double.infinity,
             height: 52,
             child: ElevatedButton.icon(
-              onPressed: () {
+              onPressed: () async {
+              final confirmed = await showDialog<bool>(
+                context: context,
+                builder: (dialogContext) {
+                  return AlertDialog(
+                    title: const Text('Complete Trade?'),
+                    content: const Text(
+                      'Confirm that you and the other trader have completed this exchange.',
+                    ),
+                    actions: [
+                      TextButton(
+                        onPressed: () {
+                          Navigator.pop(dialogContext, false);
+                        },
+                        child: const Text('Not Yet'),
+                      ),
+                      ElevatedButton(
+                        onPressed: () {
+                          Navigator.pop(dialogContext, true);
+                        },
+                        child: const Text('Confirm Trade'),
+                      ),
+                    ],
+                  );
+                },
+              );
+
+              if (confirmed == true && context.mounted) {
+                      setState(() {
+                        tradeCompleted = true;
+                      });
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
-                    content: Text('Trade completion will be connected next.'),
+                    content: Text('Trade marked as completed.'),
                   ),
                 );
-              },
+              }
+            },
               icon: const Icon(Icons.check_circle_outline_rounded),
               label: const Text(
                 'Complete Trade',
