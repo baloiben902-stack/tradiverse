@@ -2,12 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:record/record.dart';
 import 'package:path_provider/path_provider.dart';
 
+import '../../services/messaging_service.dart';
+
 class ConversationScreen extends StatefulWidget {
   final String otherUserName;
   final String itemTitle;
   final String offeredItem;
   final String cashDifference;
   final String offerMessage;
+  final String conversationId;
+  final String receiverId;
 
   const ConversationScreen({
     super.key,
@@ -16,6 +20,8 @@ class ConversationScreen extends StatefulWidget {
     this.offeredItem = '',
     this.cashDifference = '',
     this.offerMessage = '',
+    this.conversationId = '',
+    this.receiverId = '',
   });
 
   @override
@@ -24,8 +30,7 @@ class ConversationScreen extends StatefulWidget {
 
 class _ConversationScreenState extends State<ConversationScreen> {
   final TextEditingController messageController = TextEditingController();
-
-  final List<String> messages = [];
+  final MessagingService messagingService = MessagingService();
 
   final List<String> emojis = [
     '😀',
@@ -73,9 +78,9 @@ class _ConversationScreenState extends State<ConversationScreen> {
       });
 
       if (path != null && mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Voice note recorded.')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Voice note recorded.')));
       }
       return;
     }
@@ -95,10 +100,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
     final path =
         '${directory.path}/tradiverse_voice_${DateTime.now().millisecondsSinceEpoch}.m4a';
 
-    await audioRecorder.start(
-      const RecordConfig(),
-      path: path,
-    );
+    await audioRecorder.start(const RecordConfig(), path: path);
 
     setState(() {
       isRecording = true;
@@ -106,15 +108,38 @@ class _ConversationScreenState extends State<ConversationScreen> {
     });
   }
 
-  void _sendMessage() {
+  Future<void> _sendMessage() async {
     final text = messageController.text.trim();
 
     if (text.isEmpty) return;
 
-    setState(() {
-      messages.add(text);
-      messageController.clear();
-    });
+    if (widget.conversationId.isNotEmpty && widget.receiverId.isNotEmpty) {
+      try {
+        await messagingService.sendMessage(
+          conversationId: widget.conversationId,
+          receiverId: widget.receiverId,
+          text: text,
+        );
+
+        if (mounted) {
+          messageController.clear();
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context)
+              .showSnackBar(SnackBar(content: Text('Message failed: $e')));
+        }
+      }
+      return;
+    }
+
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Messaging requires a valid conversation.'),
+        ),
+      );
+    }
   }
 
   void _addEmoji(String emoji) {
@@ -160,9 +185,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(18),
-              border: Border.all(
-                color: const Color(0xFFE2E8F0),
-              ),
+              border: Border.all(color: const Color(0xFFE2E8F0)),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -189,8 +212,8 @@ class _ConversationScreenState extends State<ConversationScreen> {
                         color: tradeOfferStatus == 'Accepted'
                             ? const Color(0xFF176B4D)
                             : tradeOfferStatus == 'Declined'
-                                ? Colors.red
-                                : Colors.orange.shade700,
+                            ? Colors.red
+                            : Colors.orange.shade700,
                         fontWeight: FontWeight.w700,
                       ),
                     ),
@@ -245,28 +268,57 @@ class _ConversationScreenState extends State<ConversationScreen> {
             ),
           ),
           Expanded(
-            child: messages.isEmpty
-                ? const Center(
-                    child: Text('Start the conversation'),
-                  )
-                : ListView.builder(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    itemCount: messages.length,
-                    itemBuilder: (context, index) {
-                      return Align(
-                        alignment: Alignment.centerRight,
-                        child: Container(
-                          margin: const EdgeInsets.only(bottom: 10),
-                          padding: const EdgeInsets.all(13),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFF176B4D),
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                          child: Text(
-                            messages[index],
-                            style: const TextStyle(color: Colors.white),
-                          ),
-                        ),
+            child: widget.conversationId.isEmpty
+                ? const Center(child: Text('Start the conversation'))
+                : StreamBuilder(
+                    stream: messagingService.messagesStream(
+                      widget.conversationId,
+                    ),
+                    builder: (context, snapshot) {
+                      if (snapshot.hasError) {
+                        return const Center(
+                          child: Text('Unable to load messages'),
+                        );
+                      }
+
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const Center(child: CircularProgressIndicator());
+                      }
+
+                      final docs = snapshot.data?.docs ?? [];
+
+                      if (docs.isEmpty) {
+                        return const Center(
+                          child: Text('Start the conversation'),
+                        );
+                      }
+
+                      return ListView.builder(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        itemCount: docs.length,
+                        itemBuilder: (context, index) {
+                          final data = docs[index].data();
+                          final text = data['text'] as String? ?? '';
+                          final senderId = data['senderId'] as String? ?? '';
+
+                          return Align(
+                            alignment: senderId == widget.receiverId
+                                ? Alignment.centerLeft
+                                : Alignment.centerRight,
+                            child: Container(
+                              margin: const EdgeInsets.only(bottom: 10),
+                              padding: const EdgeInsets.all(13),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF176B4D),
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                              child: Text(
+                                text,
+                                style: const TextStyle(color: Colors.white),
+                              ),
+                            ),
+                          );
+                        },
                       );
                     },
                   ),
@@ -278,8 +330,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
               color: Colors.white,
               child: GridView.builder(
                 itemCount: emojis.length,
-                gridDelegate:
-                    const SliverGridDelegateWithFixedCrossAxisCount(
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 7,
                   childAspectRatio: 1,
                 ),
@@ -314,18 +365,16 @@ class _ConversationScreenState extends State<ConversationScreen> {
                     ),
                   ),
                   IconButton(
-              onPressed: _toggleRecording,
-              icon: Icon(
-                isRecording
-                    ? Icons.stop_circle_outlined
-                    : Icons.mic_none_rounded,
-                color: isRecording
-                    ? Colors.red
-                    : const Color(0xFF17684D),
-              ),
-              tooltip: isRecording ? 'Stop recording' : 'Voice note',
-            ),
-            Expanded(
+                    onPressed: _toggleRecording,
+                    icon: Icon(
+                      isRecording
+                          ? Icons.stop_circle_outlined
+                          : Icons.mic_none_rounded,
+                      color: isRecording ? Colors.red : const Color(0xFF17684D),
+                    ),
+                    tooltip: isRecording ? 'Stop recording' : 'Voice note',
+                  ),
+                  Expanded(
                     child: TextField(
                       controller: messageController,
                       textInputAction: TextInputAction.send,
