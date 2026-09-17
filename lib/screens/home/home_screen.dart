@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../marketplace/marketplace_screen.dart';
 import '../trades/my_trades_screen.dart';
+import '../reputation/reputation_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -137,6 +138,11 @@ class HomeScreen extends StatelessWidget {
                   icon: Icons.swap_horizontal_circle_outlined,
                   title: 'My Trades',
                   destination: MyTradesScreen(),
+            ),
+            _ExploreCard(
+              icon: Icons.verified_user_outlined,
+              title: 'Reputation',
+              destination: ReputationScreen(),
                 ),
               ],
             ),
