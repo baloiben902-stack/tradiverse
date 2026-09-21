@@ -62,6 +62,14 @@ class _ConversationScreenState extends State<ConversationScreen> {
   String? recordingPath;
 
   @override
+  void initState() {
+    super.initState();
+    if (widget.conversationId.isNotEmpty) {
+      messagingService.markConversationAsRead(widget.conversationId);
+    }
+  }
+
+  @override
   void dispose() {
     messageController.dispose();
     audioRecorder.dispose();
