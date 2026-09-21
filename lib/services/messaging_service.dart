@@ -47,6 +47,33 @@ class MessagingService {
     });
   }
 
+  Future<void> sendSticker({
+    required String conversationId,
+    required String receiverId,
+    required String stickerId,
+  }) async {
+    final user = _auth.currentUser;
+
+    if (user == null) {
+      throw StateError('User must be authenticated to send a sticker.');
+    }
+
+    if (stickerId.trim().isEmpty) {
+      throw ArgumentError('Sticker ID cannot be empty.');
+    }
+
+    await _firestore.collection('messages').add({
+      'conversationId': conversationId,
+      'senderId': user.uid,
+      'receiverId': receiverId,
+      'text': '',
+      'type': 'sticker',
+      'stickerId': stickerId.trim(),
+      'createdAt': FieldValue.serverTimestamp(),
+      'isRead': false,
+    });
+  }
+
   Future<void> markConversationAsRead(String conversationId) async {
     final user = _auth.currentUser;
 

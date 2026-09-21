@@ -56,10 +56,57 @@ class _ConversationScreenState extends State<ConversationScreen> {
   ];
 
   bool showEmojiPicker = false;
+  bool showStickerPicker = false;
+  final List<String> stickers = [
+    'lets_trade',
+    'swap',
+    'fair_value',
+    'make_offer',
+    'interested',
+    'let_me_think',
+    'hot_trade',
+    'deal',
+    'trade_complete',
+    'trusted_trade',
+    'great_trader',
+    'ready_to_swap',
+    'send_offer',
+    'win_win',
+    'no_deal',
+    'counter_offer',
+    'what_value',
+    'trade_anywhere',
+  ];
+
   String tradeOfferStatus = 'Pending';
   final AudioRecorder audioRecorder = AudioRecorder();
   bool isRecording = false;
   String? recordingPath;
+
+  String stickerLabel(String id) {
+    const labels = {
+      'lets_trade': '🤝 LET’S TRADE',
+      'swap': '🔄 SWAP?',
+      'fair_value': '💰 FAIR VALUE',
+      'make_offer': '🏷️ MAKE AN OFFER',
+      'interested': '👀 I’M INTERESTED',
+      'let_me_think': '🤔 LET ME THINK',
+      'hot_trade': '🔥 HOT TRADE',
+      'deal': '✅ DEAL!',
+      'trade_complete': '🎉 TRADE COMPLETE',
+      'trusted_trade': '🛡️ TRUSTED TRADE',
+      'great_trader': '⭐ GREAT TRADER',
+      'ready_to_swap': '📦 READY TO SWAP',
+      'send_offer': '💬 SEND YOUR OFFER',
+      'win_win': '🤝 WIN-WIN',
+      'no_deal': '❌ NO DEAL',
+      'counter_offer': '🔁 COUNTER-OFFER',
+      'what_value': '🧮 WHAT’S THE VALUE?',
+      'trade_anywhere': '🌍 TRADE ANYWHERE',
+    };
+
+    return labels[id] ?? id;
+  }
 
   @override
   void initState() {
@@ -114,6 +161,31 @@ class _ConversationScreenState extends State<ConversationScreen> {
       isRecording = true;
       recordingPath = null;
     });
+  }
+
+  Future<void> _sendSticker(String stickerId) async {
+    if (widget.conversationId.isEmpty || widget.receiverId.isEmpty) {
+      return;
+    }
+
+    try {
+      await messagingService.sendSticker(
+        conversationId: widget.conversationId,
+        receiverId: widget.receiverId,
+        stickerId: stickerId,
+      );
+
+      if (mounted) {
+        setState(() {
+          showStickerPicker = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text('Sticker failed: $e')));
+      }
+    }
   }
 
   Future<void> _sendMessage() async {
@@ -331,6 +403,45 @@ class _ConversationScreenState extends State<ConversationScreen> {
                     },
                   ),
           ),
+          if (showStickerPicker)
+            Container(
+              height: 220,
+              padding: const EdgeInsets.all(12),
+              color: Colors.white,
+              child: GridView.builder(
+                itemCount: stickers.length,
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 3,
+                  crossAxisSpacing: 8,
+                  mainAxisSpacing: 8,
+                  childAspectRatio: 2.2,
+                ),
+                itemBuilder: (context, index) {
+                  final stickerId = stickers[index];
+
+                  return InkWell(
+                    onTap: () => _sendSticker(stickerId),
+                    borderRadius: BorderRadius.circular(14),
+                    child: Container(
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFE8F4EE),
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                      child: Text(
+                        stickerLabel(stickerId),
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w700,
+                          color: Color(0xFF17684D),
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
           if (showEmojiPicker)
             Container(
               height: 210,
@@ -361,6 +472,21 @@ class _ConversationScreenState extends State<ConversationScreen> {
               padding: const EdgeInsets.fromLTRB(12, 8, 12, 12),
               child: Row(
                 children: [
+                  IconButton(
+                    onPressed: () {
+                      setState(() {
+                        showStickerPicker = !showStickerPicker;
+                        if (showStickerPicker) {
+                          showEmojiPicker = false;
+                        }
+                      });
+                    },
+                    icon: const Icon(
+                      Icons.sticky_note_2_outlined,
+                      color: Color(0xFF176B4D),
+                    ),
+                    tooltip: 'Tradiverse stickers',
+                  ),
                   IconButton(
                     onPressed: () {
                       setState(() {
