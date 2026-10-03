@@ -378,8 +378,8 @@ class _ConversationScreenState extends State<ConversationScreen> {
                         itemCount: docs.length,
                         itemBuilder: (context, index) {
                           final data = docs[index].data();
-                          final text = data['text'] as String? ?? '';
-                          final senderId = data['senderId'] as String? ?? '';
+                          final text = data['text'] as String;
+                          final senderId = data['senderId'] as String;
 
                           return Align(
                             alignment: senderId == widget.receiverId
