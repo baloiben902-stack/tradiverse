@@ -6,104 +6,69 @@ import 'screens/home/home_screen.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
-
   runApp(const TradiverseApp());
 }
 
-class TradiverseApp extends StatelessWidget {
+class TradiverseApp extends StatefulWidget {
   const TradiverseApp({super.key});
+
+  @override
+  State<TradiverseApp> createState() => _TradiverseAppState();
+}
+
+class _TradiverseAppState extends State<TradiverseApp> {
+  String status = 'Starting Tradiverse...';
+  bool firebaseReady = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _initializeFirebase();
+  }
+
+  Future<void> _initializeFirebase() async {
+    try {
+      await Firebase.initializeApp(
+        options: DefaultFirebaseOptions.currentPlatform,
+      );
+
+      if (!mounted) return;
+
+      setState(() {
+        firebaseReady = true;
+        status = 'Firebase initialized successfully.';
+      });
+    } catch (e) {
+      if (!mounted) return;
+
+      setState(() {
+        status = 'Firebase initialization failed:\\n\\n$e';
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Tradiverse',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: Colors.green,
-        ),
-        useMaterial3: true,
-      ),
-      home: const HomeScreen(),
-    );
-  }
-}
-
-class TradiverseHome extends StatelessWidget {
-  const TradiverseHome({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'Tradiverse',
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Trade Anything. Value Everything.',
-              style: TextStyle(
-                fontSize: 28,
-                fontWeight: FontWeight.bold,
+      home: firebaseReady
+          ? const HomeScreen()
+          : Scaffold(
+              appBar: AppBar(
+                title: const Text('Tradiverse Startup'),
               ),
-            ),
-            const SizedBox(height: 10),
-            const Text(
-              'Turn what you have into what you need through trusted exchanges.',
-              style: TextStyle(fontSize: 16),
-            ),
-            const SizedBox(height: 24),
-            Card(
-              child: ListTile(
-                leading: const Icon(Icons.swap_horiz, size: 40),
-                title: const Text(
-                  'Start a Trade',
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-                subtitle: const Text(
-                  'Offer something you have and discover what you can receive.',
-                ),
-              ),
-            ),
-            const SizedBox(height: 12),
-            Card(
-              child: ListTile(
-                leading: const Icon(Icons.auto_awesome, size: 40),
-                title: const Text(
-                  'Tradiverse AI',
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-                subtitle: const Text(
-                  'Intelligent matching for better exchanges.',
-                ),
-              ),
-            ),
-            const Spacer(),
-            SizedBox(
-              width: double.infinity,
-              child: FilledButton(
-                onPressed: () {},
-                child: const Padding(
-                  padding: EdgeInsets.all(14),
+              body: Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(24),
                   child: Text(
-                    'Explore Tradiverse',
-                    style: TextStyle(fontSize: 17),
+                    status,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(fontSize: 16),
                   ),
                 ),
               ),
             ),
-          ],
-        ),
-      ),
     );
   }
 }
